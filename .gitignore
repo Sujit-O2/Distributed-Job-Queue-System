@@ -1,0 +1,45 @@
+# 🔥 Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# 🔥 Virtual Environment
+env/
+venv/
+ENV/
+.env/
+
+# 🔥 IDE
+.vscode/
+.idea/
+
+# 🔥 OS files
+.DS_Store
+Thumbs.db
+
+# 🔥 Logs
+*.log
+
+# 🔥 Database (if local)
+*.db
+*.sqlite3
+
+# 🔥 Alembic (IMPORTANT)
+alembic/versions/*.pyc
+
+# 🔥 Docker
+*.env
+docker-compose.override.yml
+
+# 🔥 Pytest / coverage
+.coverage
+htmlcov/
+
+# 🔥 Build
+dist/
+build/
+*.egg-info/
+
+# 🔥 Misc
+*.swp
