@@ -1,16 +1,104 @@
-version: '3.8'
-
 services:
   postgres:
+    container_name: jobqueue_postgres
     image: postgres:15
+    restart: unless-stopped
+    command: ["postgres", "-p", "${POSTGRES_PORT:-5433}"]
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: jobqueue
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-jobqueue}
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT:-5433}:${POSTGRES_PORT:-5433}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -p ${POSTGRES_PORT:-5433} -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-jobqueue}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app_network
+
+  migrate:
+    container_name: jobqueue_migrate
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    restart: "no"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5433/jobqueue}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["alembic", "upgrade", "head"]
+    networks:
+      - app_network
+
+  app:
+    container_name: jobqueue_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5433/jobqueue}
+      APP_PORT: ${APP_PORT:-8000}
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
+      GUNICORN_GRACEFUL_TIMEOUT: ${GUNICORN_GRACEFUL_TIMEOUT:-30}
+      GUNICORN_KEEPALIVE: ${GUNICORN_KEEPALIVE:-5}
+    ports:
+      - "${APP_PORT:-8000}:${APP_PORT:-8000}"
+    volumes:
+      - ./uploads:/app/uploads
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.getenv('APP_PORT', '8000') + '/health')\"",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    command: ["/app/docker/app-start.sh"]
+    networks:
+      - app_network
+
+  worker:
+    container_name: jobqueue_worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5433/jobqueue}
+    volumes:
+      - ./uploads:/app/uploads
+    command: ["/app/docker/worker-start.sh"]
+    networks:
+      - app_network
 
 volumes:
   postgres_data:
+
+networks:
+  app_network:
+    name: ${COMPOSE_NETWORK_NAME:-jobqueue_network}

@@ -1,18 +1,18 @@
 
-from src.modles.user_modles import User
-from src.database.database import SessionLocal
+from src.modles.user_model import User
+from sqlalchemy.orm import Session
 class AuthService:
+    def __init__(self,db: Session):
+        self.db=db
     def login_user(self, log_in):
-        db = SessionLocal()
-        user = db.query(User).filter(User.username == log_in.username).first()
+        user = self.db.query(User).filter(User.username == log_in.username).first()
         if user and user.password == log_in.password:
             return user
         return None
         
 
     def register_user(self, register):
-        db = SessionLocal()
-        db_user = db.query(User).filter(User.username == register.username).first()
+        db_user = self.db.query(User).filter(User.username == register.username).first()
         if db_user:
             return None  
         new_user = User(
@@ -21,7 +21,7 @@ class AuthService:
             full_name=register.full_name,
             password=register.password
         )
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
+        self.db.add(new_user)
+        self.db.commit()
+        self.db.refresh(new_user)
         return new_user

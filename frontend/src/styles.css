@@ -1,0 +1,487 @@
+@import "tailwindcss";
+
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap");
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --text: #f5f7ff;
+    --muted: #9fb0d8;
+  }
+
+  body {
+    @apply bg-[#03060a] text-[#f5f7ff] m-0 min-h-screen antialiased overflow-x-hidden;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(56, 215, 192, 0.12), transparent 40%),
+      radial-gradient(circle at 90% 0%, rgba(255, 111, 97, 0.10), transparent 30%),
+      radial-gradient(circle at 70% 100%, rgba(127, 217, 255, 0.12), transparent 40%),
+      linear-gradient(180deg, #07101d 0%, #0b1220 48%, #03060a 100%);
+    background-attachment: fixed;
+    font-family: "IBM Plex Sans", sans-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(171, 196, 255, 0.2);
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(127, 217, 255, 0.4);
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply relative flex flex-col md:grid md:grid-cols-[280px_1fr] min-h-screen text-[#f5f7ff];
+  }
+
+  .ambient {
+    @apply fixed rounded-full blur-[90px] pointer-events-none -z-10;
+  }
+
+  .ambient-a {
+    @apply top-[8%] -left-[80px] w-[240px] h-[240px] bg-[#38d7c0]/15;
+  }
+
+  .ambient-b {
+    @apply right-[5%] bottom-[8%] w-[260px] h-[260px] bg-[#ff9a49]/15;
+  }
+
+  .command-rail {
+    @apply p-7 border-b md:border-b-0 md:border-r border-[#abc4ff]/20 bg-gradient-to-b from-[#08111f]/90 to-[#08111f]/60 backdrop-blur-xl z-20 sticky top-0 h-auto md:h-screen overflow-y-auto;
+  }
+
+  .main-stage {
+    @apply p-4 md:p-8 z-10 w-full overflow-x-hidden;
+  }
+
+  .brand-mark {
+    @apply flex items-center gap-3 mb-8;
+  }
+
+  .brand-mark h1 {
+    @apply m-0 mt-1 font-['Space_Grotesk'] text-2xl tracking-tight bg-gradient-to-r from-white to-[#abc4ff] bg-clip-text text-transparent drop-shadow-sm;
+  }
+
+  .brand-mark__glyph,
+  .principle-card__icon,
+  .metric-card__icon,
+  .empty-state__icon {
+    @apply grid place-items-center w-10 h-10 rounded-2xl bg-gradient-to-br from-[#38d7c0]/20 via-[#7fd9ff]/10 to-transparent border border-[#7fd9ff]/30 shrink-0 shadow-[0_0_20px_rgba(127,217,255,0.1)];
+  }
+
+  .eyebrow {
+    @apply m-0 text-[0.72rem] tracking-[0.18em] uppercase text-[#9fb0d8] font-bold;
+  }
+
+  .nav-stack {
+    @apply grid gap-2.5;
+  }
+
+  .nav-chip {
+    @apply flex items-stretch gap-3 pl-4 pr-5 py-3.5 border border-[#abc4ff]/10 rounded-2xl text-[#9fb0d8] transition-all duration-200 bg-white/5 font-medium;
+  }
+
+  .nav-chip:hover,
+  .nav-chip.is-active {
+    @apply translate-x-1 text-white border-[#abc4ff]/30 bg-gradient-to-br from-white/10 to-[#38d7c0]/10 ring-2 ring-[#38d7c0]/20 shadow-lg shadow-[#38d7c0]/5;
+  }
+
+  .signal-card {
+    @apply mt-6 p-5 rounded-3xl border border-[#abc4ff]/10 bg-[#0c182b]/80 shadow-2xl;
+  }
+
+  .signal-card strong {
+    @apply block my-2 text-lg font-['Space_Grotesk'] tracking-tight;
+  }
+
+  .signal-card p {
+    @apply m-0 text-[#9fb0d8] text-sm leading-relaxed;
+  }
+
+  .signal-card--dense {
+    @apply grid gap-2.5 mt-4;
+  }
+
+  .hero-banner {
+    @apply flex flex-col lg:flex-row justify-between gap-6 lg:items-start p-6 lg:p-8 rounded-[32px] bg-gradient-to-br from-[#38d7c0]/10 to-[#ff9a49]/5 border border-[#abc4ff]/10 shadow-2xl backdrop-blur-md;
+  }
+
+  .hero-banner h2 {
+    @apply mt-2 lg:max-w-md font-['Space_Grotesk'] text-3xl lg:text-5xl leading-tight tracking-tight shadow-sm;
+  }
+
+  .hero-actions {
+    @apply grid gap-3 lg:justify-items-end mt-4 lg:mt-0;
+  }
+
+  .hero-link,
+  .status-pill,
+  .panel__badge {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#abc4ff]/20 text-white bg-white/5 backdrop-blur-sm text-sm font-medium tracking-wide transition-all;
+  }
+
+  .hero-link:hover {
+    @apply bg-white/10 ring-2 ring-white/10;
+  }
+
+  .status-pill.is-up {
+    @apply border-[#4ad7a3]/40 text-[#4ad7a3] bg-[#4ad7a3]/5 shadow-[0_0_15px_rgba(74,215,163,0.1)];
+  }
+
+  .status-pill.is-warm {
+    @apply border-[#f7b955]/40 text-[#f7b955] bg-[#f7b955]/5 shadow-[0_0_15px_rgba(247,185,85,0.1)];
+  }
+
+  .page-shell {
+    @apply mt-8;
+  }
+
+  .page-grid {
+    @apply grid gap-6;
+  }
+
+  .page-grid--studio,
+  .page-grid--access {
+    @apply lg:grid-cols-[1.5fr_1fr];
+  }
+
+  .page-grid--builder {
+    @apply lg:grid-cols-[280px_1fr_320px] items-start;
+  }
+
+  .metrics-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5;
+  }
+
+  .metric-card {
+    @apply flex gap-4 p-5 rounded-[28px] border border-[#abc4ff]/10 bg-[#0c182b]/80 shadow-xl backdrop-blur-lg transition-transform hover:-translate-y-1 hover:border-[#abc4ff]/30 hover:shadow-[#abc4ff]/5;
+  }
+
+  .metric-card p,
+  .metric-card span {
+    @apply m-0 text-[#9fb0d8] text-sm;
+  }
+
+  .metric-card strong {
+    @apply block my-1 text-3xl font-['Space_Grotesk'];
+  }
+
+  .panel {
+    @apply p-6 lg:p-8 rounded-[32px] border border-white/5 bg-gradient-to-b from-[#0c182b]/80 to-[#050a14]/90 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-300;
+  }
+
+  .panel--wide {
+    @apply lg:col-span-full;
+  }
+
+  .panel__header {
+    @apply flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6;
+  }
+
+  .panel__header h3 {
+    @apply mt-2 text-2xl font-['Space_Grotesk'] tracking-tight;
+  }
+
+  .task-launch-hero {
+    @apply flex flex-col md:flex-row justify-between gap-6 md:items-start;
+  }
+
+  .task-launch-hero h3,
+  .builder-task-head h3 {
+    @apply mt-2 text-3xl font-['Space_Grotesk'] tracking-tight;
+  }
+
+  .chart-wrap {
+    @apply min-h-[280px] mt-4;
+  }
+
+  .chart-wrap--split {
+    @apply grid lg:grid-cols-[1fr_220px] gap-6 items-center;
+  }
+
+  .legend-stack {
+    @apply grid gap-3;
+  }
+
+  .legend-row {
+    @apply grid grid-cols-[12px_1fr_auto] gap-3 items-center text-[#9fb0d8] text-sm font-medium;
+  }
+
+  .legend-dot {
+    @apply w-3 h-3 rounded-full shadow-sm;
+  }
+
+  .activity-stack,
+  .job-list,
+  .principles {
+    @apply grid gap-3;
+  }
+
+  .activity-item,
+  .job-row {
+    @apply flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full p-4 rounded-2xl border border-[#abc4ff]/10 bg-white/5 text-left transition-all hover:-translate-y-0.5 hover:border-[#abc4ff]/30 hover:bg-white/10 hover:shadow-xl;
+  }
+
+  .activity-item p,
+  .job-row p,
+  .template-copy,
+  .principle-card p,
+  .empty-state p {
+    @apply m-0 mt-1.5 text-[#9fb0d8] leading-relaxed text-sm;
+  }
+
+  .status-patch {
+    @apply px-4 py-1.5 rounded-full capitalize border text-sm font-bold tracking-wide shadow-sm self-start sm:self-auto;
+  }
+
+  .status-pending {
+    @apply text-[#f7b955] bg-[#f7b955]/10 border-[#f7b955]/30;
+  }
+
+  .status-in_progress {
+    @apply text-[#ff6f61] bg-[#ff6f61]/10 border-[#ff6f61]/30 animate-pulse;
+  }
+
+  .status-completed {
+    @apply text-[#4ad7a3] bg-[#4ad7a3]/10 border-[#4ad7a3]/30;
+  }
+
+  .status-failed {
+    @apply text-[#f04f6e] bg-[#f04f6e]/10 border-[#f04f6e]/30;
+  }
+
+  .job-grid {
+    @apply grid lg:grid-cols-[1fr_1.2fr] gap-6;
+  }
+
+  .job-detail {
+    @apply grid gap-5 p-6 lg:p-8 rounded-[32px] bg-gradient-to-br from-[#0c182b]/95 to-[#060b14]/95 border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl;
+  }
+
+  .job-detail__header {
+    @apply flex sm:flex-row flex-col justify-between items-start gap-4 border-b border-white/5 pb-5;
+  }
+
+  .job-detail__header h4 {
+    @apply mt-2 text-2xl font-['Space_Grotesk'] tracking-tight;
+  }
+
+  .detail-meta {
+    @apply flex flex-wrap gap-3 text-[#9fb0d8] text-xs font-mono uppercase tracking-wider bg-black/30 p-3 rounded-xl border border-white/5;
+  }
+
+  .code-blocks {
+    @apply grid gap-4 mt-2;
+  }
+
+  .code-panel {
+    @apply p-4 rounded-2xl bg-black/40 border border-[#abc4ff]/10;
+  }
+
+  .code-panel pre {
+    @apply mt-3 text-[#d5e0ff] font-mono text-sm leading-relaxed max-h-[250px] overflow-auto whitespace-pre-wrap select-all;
+  }
+
+  .action-row {
+    @apply flex flex-wrap items-center gap-3 mt-6;
+  }
+
+  .button {
+    @apply inline-flex items-center justify-center gap-2 border rounded-xl px-4 py-2 text-sm bg-white/5 text-white font-semibold tracking-wide transition-all hover:bg-white/10 hover:shadow-lg active:translate-y-0 focus:ring-4 focus:ring-white/10;
+  }
+
+  .button--primary {
+    @apply bg-gradient-to-r from-[#38d7c0]/30 to-[#7fd9ff]/20 border-[#7fd9ff]/40 shadow-lg shadow-[#38d7c0]/10 hover:shadow-[#38d7c0]/20;
+  }
+
+  .button--danger {
+    @apply bg-[#f04f6e]/15 border-[#f04f6e]/40 hover:bg-[#f04f6e]/25 text-[#f04f6e];
+  }
+
+  .button--ghost {
+    @apply border-[#abc4ff]/30 text-[#abc4ff];
+  }
+
+  .composer-form {
+    @apply grid gap-5 mt-4;
+  }
+
+  .composer-section {
+    @apply grid gap-4 p-5 rounded-3xl border border-[#abc4ff]/20 bg-[#0c182b]/80 shadow-inner backdrop-blur-md;
+  }
+
+  .composer-section__header h4 {
+    @apply mt-1 text-lg font-['Space_Grotesk'] text-white;
+  }
+
+  .field-grid {
+    @apply grid lg:grid-cols-2 gap-4;
+  }
+
+  .field {
+    @apply grid gap-2.5;
+  }
+
+  .field-label {
+    @apply text-[#9fb0d8] text-sm font-semibold tracking-wide flex items-center gap-2;
+  }
+
+  .field-help,
+  .panel-subcopy {
+    @apply text-[#9fb0d8] text-[0.82rem] leading-relaxed italic;
+  }
+
+  .text-input,
+  .text-area {
+    @apply w-full p-4 rounded-xl border border-[#abc4ff]/20 bg-black/30 text-white font-medium focus:border-[#7fd9ff] focus:ring-4 focus:ring-[#7fd9ff]/10 outline-none transition-all shadow-inner;
+  }
+
+  .text-input--compact {
+    @apply max-w-sm;
+  }
+
+  .text-area {
+    @apply min-h-[140px] resize-y;
+  }
+
+  .text-area--code {
+    @apply min-h-[300px] font-mono text-sm leading-relaxed bg-[#050914] text-[#d5e0ff];
+  }
+
+  .toggle-field {
+    @apply flex justify-between items-center gap-4 p-4 rounded-xl border border-[#abc4ff]/20 bg-black/30 cursor-pointer hover:border-[#7fd9ff]/40 transition-colors;
+  }
+
+  .checkbox-input {
+    @apply w-5 h-5 rounded border-[#abc4ff]/30 text-[#7fd9ff] focus:ring-[#7fd9ff]/20 bg-black/50;
+  }
+
+  .upload-control {
+    @apply grid gap-3 mt-1 p-5 rounded-xl border-2 border-dashed border-[#7fd9ff]/30 bg-[#7fd9ff]/5 hover:bg-[#7fd9ff]/10 transition-colors hover:border-[#7fd9ff]/50;
+  }
+
+  .upload-control__row {
+    @apply flex flex-wrap gap-4 items-center;
+  }
+
+  .upload-control__hint {
+    @apply text-[#9fb0d8] text-sm;
+  }
+
+  .upload-status {
+    @apply m-0 text-sm font-medium p-2 bg-black/30 rounded-lg;
+  }
+
+  .payload-preview {
+    @apply grid gap-4 p-5 rounded-3xl border border-[#abc4ff]/20 bg-[#0c182b]/80;
+  }
+
+  .builder-rail,
+  .builder-stage,
+  .builder-summary {
+    @apply grid gap-5 content-start;
+  }
+
+  .step-stack {
+    @apply grid gap-3;
+  }
+
+  .builder-step {
+    @apply grid grid-cols-[44px_1fr] gap-4 w-full p-4 rounded-2xl border border-[#abc4ff]/10 bg-white/5 text-left transition-all;
+  }
+
+  .builder-step.is-active {
+    @apply border-[#7fd9ff]/40 bg-gradient-to-b from-[#7fd9ff]/10 to-transparent ring-2 ring-[#7fd9ff]/10;
+  }
+
+  .builder-step__index {
+    @apply grid place-items-center w-11 h-11 rounded-xl border border-[#abc4ff]/20 bg-black/30 font-['Space_Grotesk'] font-bold text-lg;
+  }
+
+  .builder-step__meta {
+    @apply grid gap-1;
+  }
+
+  .builder-step__meta strong {
+    @apply text-lg;
+  }
+
+  .atlas-grid {
+    @apply grid sm:grid-cols-2 lg:grid-cols-4 gap-5;
+  }
+
+  .atlas-grid--launcher {
+    @apply lg:grid-cols-3;
+  }
+
+  .atlas-card {
+    @apply relative grid gap-3.5 p-6 rounded-[28px] border border-[#abc4ff]/10 bg-[#0c182b]/95 shadow-lg text-left transition-all hover:-translate-y-1 hover:border-[#abc4ff]/40 hover:shadow-[0_15px_40px_rgba(127,217,255,0.1)] overflow-hidden;
+  }
+
+  .atlas-card.is-selected {
+    @apply border-[#38d7c0]/50 ring-4 ring-[#38d7c0]/10 bg-gradient-to-br from-[#0c182b] to-[#38d7c0]/5;
+  }
+
+  .atlas-card__top {
+    @apply grid gap-1;
+  }
+
+  .atlas-card__top p {
+    @apply m-0 text-xs font-mono tracking-widest text-[#9fb0d8] uppercase;
+  }
+
+  .atlas-card__top strong {
+    @apply text-xl font-['Space_Grotesk'] text-white transition-colors mt-1;
+  }
+
+  .atlas-card:hover .atlas-card__top strong {
+    @apply text-[#7fd9ff];
+  }
+
+  .atlas-card__details {
+    @apply flex flex-wrap gap-2 mt-2 pt-4 border-t border-[#abc4ff]/10;
+  }
+
+  .atlas-card__cta {
+    @apply mt-2 inline-flex items-center font-bold text-sm text-[#7fd9ff] uppercase tracking-wider;
+  }
+
+  .atlas-card:hover .atlas-card__cta {
+    text-decoration: underline;
+  }
+
+  .template-pill-stack {
+    @apply flex flex-wrap gap-2 mt-4;
+  }
+
+  .template-pill {
+    @apply px-3 py-1.5 bg-black/40 border border-[#abc4ff]/20 rounded-lg text-xs font-mono tracking-wide text-[#9fb0d8];
+  }
+
+  .empty-state {
+    @apply flex flex-col items-center justify-center text-center p-12 rounded-[28px] border border-dashed border-[#abc4ff]/20 bg-[#0c182b]/50;
+  }
+
+  .empty-state__icon {
+    @apply mb-4 p-4 w-20 h-20 rounded-full border border-white/5;
+  }
+
+  .feedback {
+    @apply p-4 rounded-xl text-sm font-medium mt-2 shadow-md flex items-center gap-3 backdrop-blur-md;
+  }
+
+  .feedback--error {
+    @apply text-[#f04f6e] bg-[#f04f6e]/10 border border-[#f04f6e]/30;
+  }
+
+  .feedback--success {
+    @apply text-[#4ad7a3] bg-[#4ad7a3]/10 border border-[#4ad7a3]/30;
+  }
+}

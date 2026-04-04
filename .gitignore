@@ -30,6 +30,10 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+node_modules/
+frontend/node_modules/
+uploads/*
+!uploads/.gitkeep
 
 
 *.swp
