@@ -24,6 +24,7 @@ services:
     networks:
       - app_network
 
+
   migrate:
     container_name: jobqueue_migrate
     build:
@@ -50,15 +51,21 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5433/jobqueue}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       APP_PORT: ${APP_PORT:-8000}
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
       GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
       GUNICORN_GRACEFUL_TIMEOUT: ${GUNICORN_GRACEFUL_TIMEOUT:-30}
       GUNICORN_KEEPALIVE: ${GUNICORN_KEEPALIVE:-5}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change_me_in_production}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES:-1440}
     ports:
       - "${APP_PORT:-8000}:${APP_PORT:-8000}"
     volumes:
@@ -86,18 +93,49 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5433/jobqueue}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      WORKER_POLL_INTERVAL: ${WORKER_POLL_INTERVAL:-5}
+      WORKER_TASK_TIMEOUT: ${WORKER_TASK_TIMEOUT:-600}
+      WORKER_MAX_RETRIES: ${WORKER_MAX_RETRIES:-3}
+      WORKER_MAX_TASKS: ${WORKER_MAX_TASKS:-1000}
+      WORKER_HEARTBEAT_INTERVAL: ${WORKER_HEARTBEAT_INTERVAL:-30}
+      WORKER_NAME: ${WORKER_NAME:-Worker-1}
     volumes:
       - ./uploads:/app/uploads
     command: ["/app/docker/worker-start.sh"]
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 512M
+    networks:
+      - app_network
+
+  frontend:
+    container_name: jobqueue_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    pull_policy: build
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
     networks:
       - app_network
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   app_network:
